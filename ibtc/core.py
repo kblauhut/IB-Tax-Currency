@@ -34,24 +34,20 @@ def csv_to_obj(path):
 
 
 def create_output_csv(obj_arr, currency):
-    with open('test-csv/out.csv', 'w', newline='') as csvfile:
+    with open('test-csv/out.csv', 'w', newline='', encoding='utf8') as csvfile:
         writer = csv.writer(csvfile)
 
+        writer.writerow(["Stückzahl", "Symbol", "Kaufdatum", "Kaufpreis (" + currency + ")",
+                         "Verkaufdatum", "Verkaufserlös (" + currency + ")", "Gewinn/Verlust"])
+
         for obj in obj_arr:
-            writer.writerow(["Symbol", "Date", "Quantity",
-                             "Share Price (" + currency + ")", "Proceeds (" + currency + ")", "P/L (" + currency + ")"])
             create_rows(writer, obj, currency)
-            writer.writerow(["", "", "", "", "", ""])
 
 
 def create_rows(writer, obj, currency):
     sale_exchange_rate = get_exchange_rate(
         obj.get_date(), currency, obj.get_currency())
     sale_share_price = exchange(sale_exchange_rate, obj.get_share_price())
-    sale_proceeds = sale_share_price * abs(obj.get_quantity())
-    closed_lot_total = 0
-
-    closed_lot_rows = []
 
     for closed_lot in obj.get_closed_lots():
         closed_lot_row = []
@@ -61,22 +57,18 @@ def create_rows(writer, obj, currency):
         lot_share_price = exchange(
             lot_exchange_rate, closed_lot.get_share_price())
 
+        closed_lot_row.append(closed_lot.get_quantity())
         closed_lot_row.append(obj.get_symbol())
         closed_lot_row.append(closed_lot.get_date())
-        closed_lot_row.append(closed_lot.get_quantity())
-        closed_lot_row.append(round(lot_share_price, 2))
-        closed_lot_row.append("")
-        closed_lot_row.append("")
+        closed_lot_row.append(
+            round(lot_share_price * closed_lot.get_quantity(), 2))
+        closed_lot_row.append(obj.get_date())
+        closed_lot_row.append(
+            round(sale_share_price * closed_lot.get_quantity(), 2))
+        closed_lot_row.append(round(sale_share_price * closed_lot.get_quantity() -
+                                    lot_share_price * closed_lot.get_quantity(), 2))
 
-        closed_lot_total = closed_lot_total + lot_share_price * closed_lot.get_quantity()
-        closed_lot_rows.append(closed_lot_row)
-
-    sale_profit = sale_proceeds - closed_lot_total
-    writer.writerow([obj.get_symbol(), obj.get_date(),
-                     obj.get_quantity(), round(sale_share_price, 2), round(sale_proceeds, 2), round(sale_profit, 2)])
-
-    for row in closed_lot_rows:
-        writer.writerow(row)
+        writer.writerow(closed_lot_row)
 
 
 def get_exchange_rate(date, currency, base_currency):
