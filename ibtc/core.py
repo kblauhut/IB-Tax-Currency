@@ -1,4 +1,5 @@
 from ibtc.struct import Sale, ClosedLot
+import datetime
 import requests
 import csv
 
@@ -21,7 +22,7 @@ def csv_to_obj(path):
                 n = i + 1
                 while reader[n][2] == "ClosedLot":
                     closed_lot = ClosedLot(
-                        float(reader[n][9]), reader[n][6], int(reader[n][8]))
+                        float(reader[n][9]), date_reformat(reader[n][6]), int(reader[n][8]))
                     closed_lots_arr.append(closed_lot)
                     n = n+1
             if len(closed_lots_arr) != 0:
@@ -74,10 +75,8 @@ def create_rows(writer, obj, currency):
 def get_exchange_rate(date, currency, base_currency):
     if currency == base_currency:
         return 1
-
     url = "https://api.exchangeratesapi.io/" + date + "?base=" + base_currency
     response = requests.get(url)
-
     return response.json()["rates"][currency]
 
 
@@ -87,9 +86,20 @@ def exchange(exchange_rate, value):
 
 def get_date(date_time_str):
     index = date_time_str.index(",")
-    return date_time_str[:index]
+    return date_reformat(date_time_str[:index])
 
 
 def get_time(date_time_str):
     index = date_time_str.index(" ")
     return date_time_str[index+1:]
+
+
+def date_reformat(date_str):
+    if date_str.index("-") == 4:
+        return date_str
+
+    index = len(date_str) - 2
+    date_str = date_str[:index] + "20" + date_str[index:]
+    format_str = "%d-%m-%Y"
+    datetime_obj = datetime.datetime.strptime(date_str, format_str)
+    return str(datetime_obj.date())

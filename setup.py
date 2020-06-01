@@ -9,5 +9,5 @@ setup(
     entry_points={
         'console_scripts': ['run=ibtc.core:main'],
     },
-    install_requires=['colorama', 'requests', 'tqdm']
+    install_requires=['requests']
 )
