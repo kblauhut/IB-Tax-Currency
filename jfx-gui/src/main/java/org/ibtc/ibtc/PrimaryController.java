@@ -1,16 +1,13 @@
 package org.ibtc.ibtc;
 
 import java.io.File;
-import java.net.URL;
 
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.SVGPath;
@@ -38,13 +35,30 @@ public class PrimaryController {
             	
                 if (event.getGestureSource() != fileDropField
                         && event.getDragboard().hasFiles()) {
-                    tfdFileDropStatus.setStyle("-fx-text-fill: blue;");
-            		svgStatusIcon.setStyle("-fx-text-fill: blue;");
-                    event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
+            		event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
                 }
                 event.consume();
             }
         });
+		
+		fileDropField.setOnDragEntered(new EventHandler<DragEvent>() {
+
+            @Override
+            public void handle(DragEvent event) {
+            	tfdFileDropStatus.setStyle("-fx-text-fill: #99e6ff;");
+        		svgStatusIcon.setStyle("-fx-fill: #99e6ff;");
+        		event.consume();
+            }
+        });
+		
+		fileDropField.setOnDragExited(new EventHandler<DragEvent>() {
+			@Override
+            public void handle(DragEvent event) {
+				tfdFileDropStatus.setStyle("-fx-text-fill: #a8a8a8;");
+        		svgStatusIcon.setStyle("-fx-fill: #a8a8a8;");
+        		event.consume();
+            }
+		});
 
 		fileDropField.setOnDragDropped(new EventHandler<DragEvent>() {
 
@@ -53,11 +67,11 @@ public class PrimaryController {
                 Dragboard db = event.getDragboard();
                 boolean success = false;
                 if (db.hasFiles()) {
-                	tfdFileDropStatus.setText(db.getFiles().toString());
-                    success = true;
+                	executeScript();
+                    success = true; 
                 }
                 event.setDropCompleted(success);
-
+                
                 event.consume();
             }
         });
@@ -71,5 +85,14 @@ public class PrimaryController {
 		if (dir != null) {
 			tfdOutputPath.setText(dir.getAbsolutePath());
 		}	
+	}
+	
+	private void executeScript() {
+		if (dir == null) {
+			return;
+		}
+		//Run script
+
+		tfdFileDropStatus.setText("Processing...");
 	}
 }
