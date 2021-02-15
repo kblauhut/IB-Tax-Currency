@@ -5,7 +5,7 @@ import csv
 
 
 def main():
-    obj_arr = csv_to_obj('test-csv/ibreport.csv')
+    obj_arr = csv_to_obj('ibreport.csv')
     create_output_csv(obj_arr, "EUR")
 
 
@@ -35,7 +35,7 @@ def csv_to_obj(path):
 
 
 def create_output_csv(obj_arr, currency):
-    with open('test-csv/out.csv', 'w', newline='', encoding='utf8') as csvfile:
+    with open('out.csv', 'w', newline='', encoding='utf8') as csvfile:
         writer = csv.writer(csvfile)
 
         writer.writerow(["Stückzahl", "Symbol", "Kaufdatum", "Kaufpreis (" + currency + ")",
