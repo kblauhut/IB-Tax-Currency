@@ -22,7 +22,7 @@ def csv_to_obj(path):
                 n = i + 1
                 while reader[n][2] == "ClosedLot":
                     closed_lot = ClosedLot(
-                        float(reader[n][9]), date_reformat(reader[n][6]), int(reader[n][8]))
+                        float(reader[n][9]), date_reformat(reader[n][6]), float(reader[n][8]))
                     closed_lots_arr.append(closed_lot)
                     n = n+1
             if len(closed_lots_arr) != 0:
@@ -103,3 +103,6 @@ def date_reformat(date_str):
     format_str = "%d-%m-%Y"
     datetime_obj = datetime.datetime.strptime(date_str, format_str)
     return str(datetime_obj.date())
+
+
+main()
